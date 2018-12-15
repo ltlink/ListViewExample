@@ -1,5 +1,7 @@
 package com.example.service_admin.listviewexample;
 
+import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -16,31 +18,49 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        itemList = new ArrayList<Item>();
-        itemAdapter = new ItemAdapter(itemList,this);
+
+        DatabaseAdapter dbAdapter = new DatabaseAdapter(this);
+
+        itemList = dbAdapter.getItemList();
+
+        itemAdapter = new ItemAdapter(itemList,this, dbAdapter);
+
         ListView itemListView = findViewById(R.id.listViewPrincipal);
 
         itemListView.setAdapter(itemAdapter);
-        Item newItem = new Item();
-
-        newItem.setName("Carro");
-        newItem.setDescription("Un Carro");
-        newItem.setImageId(R.mipmap.ic_launcher_round);
-        itemAdapter.AddItem(newItem);
 
         Button btnAdd = findViewById(R.id.AddItem);
 
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Item newItem = new Item();
+                /*Item newItem = new Item();
 
                 newItem.setName("Carro mas nuevo");
                 newItem.setDescription("Un Carro super nuevo");
                 newItem.setImageId(R.mipmap.carro);
 
-                itemAdapter.AddItem(newItem);
+                itemAdapter.AddItem(newItem);*/
+
+                Intent intent = new Intent(MainActivity.this,ItemActivity.class);
+                startActivityForResult(intent,1);
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        String name = data.getStringExtra("name");
+        String description = data.getStringExtra("descripcion");
+        int imagenId = data.getIntExtra("imagen",R.mipmap.ic_launcher);
+
+        Item newItem = new Item();
+        newItem.setName(name);
+        newItem.setDescription(description);
+        newItem.setImageId(imagenId);
+
+        itemAdapter.AddItem(newItem);
     }
 }
